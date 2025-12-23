@@ -1,0 +1,36 @@
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    // Guardar en base de datos (ejemplo con MySQLi)
+    $conn = new mysqli("localhost", "usuario", "contraseña", "barberia");
+    $stmt = $conn->prepare("INSERT INTO reservas (servicio, precio, fecha, hora, nombre, telefono, email) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sississ", 
+        $data['service'], 
+        $data['price'],
+        $data['date'],
+        $data['time'],
+        $data['name'],
+        $data['phone'],
+        $data['email']
+    );
+    $stmt->execute();
+    
+    // Enviar correo a tu Gmail
+    $to = "jonatandiazceres15@gmail.com";
+    $subject = "Nueva reserva - " . $data['name'];
+    $message = "Nueva reserva:\n\n" .
+               "Servicio: " . $data['service'] . "\n" .
+               "Precio: $" . $data['price'] . "\n" .
+               "Fecha: " . $data['date'] . "\n" .
+               "Hora: " . $data['time'] . "\n" .
+               "Cliente: " . $data['name'] . "\n" .
+               "Teléfono: " . $data['phone'] . "\n" .
+               "Email: " . $data['email'];
+    
+    mail($to, $subject, $message);
+    
+    // Responder al frontend
+    echo json_encode(["success" => true]);
+}
+?>

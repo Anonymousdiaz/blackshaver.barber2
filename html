@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turno Barbería</title>
+    <style>
+        /* Estilos minimalistas en negro total */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.4;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            font-weight: 300;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .form-section, .summary {
+            background: #111;
+            padding: 25px;
+            border: 1px solid #222;
+            border-radius: 0;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #222;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+        
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        @media (min-width: 480px) {
+            .option-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .option {
+            padding: 15px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            background: #111;
+        }
+        
+        .option:hover {
+            border-color: #666;
+        }
+        
+        .option.selected {
+            border-color: #fff;
+            background: #222;
+        }
+        
+        .calendar {
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-header button {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #888;
+            padding: 5px 10px;
+        }
+        
+        .calendar-header div {
+            color: #fff;
+            font-size: 14px;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+        
+        .calendar-day {
+            font-size: 11px;
+            color: #888;
+            padding: 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .calendar-date {
+            padding: 12px 0;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 13px;
+            background: #111;
+        }
+        
+        .calendar-date:hover {
+            border-color: #444;
+        }
+        
+        .calendar-date.selected {
+            background-color: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+        
+        .calendar-date.disabled {
+            color: #333;
+            cursor: default;
+            background: #0a0a0a;
+        }
+        
+        .calendar-date.disabled:hover {
+            border-color: transparent;
+        }
+        
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .time-slot {
+            padding: 10px;
+            border: 1px solid #333;
+            text-align: center;
+            cursor: pointer;
+            font-size: 13px;
+            background: #111;
+        }
+        
+        .time-slot:hover {
+            border-color: #666;
+        }
+        
+        .time-slot.selected {
+            border-color: #fff;
+            background: #222;
+        }
+        
+        .time-slot.disabled {
+            background: #0a0a0a;
+            border-color: #222;
+            color: #444;
+            cursor: not-allowed;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            color: #888;
+            font-weight: 300;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            font-size: 13px;
+            background: #111;
+            color: #fff;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #666;
+        }
+        
+        .input-group input::placeholder {
+            color: #444;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #222;
+            font-size: 13px;
+        }
+        
+        .summary-label {
+            color: #888;
+        }
+        
+        .summary-value {
+            color: #fff;
+        }
+        
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #222;
+            font-weight: 500;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 20px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        button:hover {
+            background-color: #f0f0f0;
+        }
+        
+        button:disabled {
+            background-color: #222;
+            color: #444;
+            cursor: not-allowed;
+            border: 1px solid #333;
+        }
+        
+        .status-message {
+            padding: 15px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            display: none;
+            border: 1px solid;
+        }
+        
+        .success {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-color: #fff;
+        }
+        
+        .error {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+        
+        .loading {
+            color: #888;
+            border-color: #333;
+        }
+        
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #222;
+            text-align: center;
+            font-size: 11px;
+            color: #444;
+        }
+        
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>BARBERÍA</h1>
+        <div class="subtitle">Reserva tu turno</div>
+    </header>
+    
+    <div class="container">
+        <div class="form-section">
+            <div class="section-title">Servicio</div>
+            <div class="option-grid" id="services">
+                <!-- Los servicios se cargan con JavaScript -->
+            </div>
+            
+            <div class="section-title">Fecha y hora</div>
+            <div class="calendar" id="calendar-container">
+                <!-- El calendario se genera con JavaScript -->
+            </div>
+            
+            <div class="time-slots" id="time-slots">
+                <!-- Los horarios se cargan con JavaScript -->
+            </div>
+            
+            <div class="section-title">Tus datos</div>
+            <div class="input-group">
+                <label for="name">Nombre</label>
+                <input type="text" id="name" placeholder="Ingresa tu nombre">
+            </div>
+            <div class="input-group">
+                <label for="phone">Teléfono</label>
+                <input type="tel" id="phone" placeholder="Ingresa tu teléfono">
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Ingresa tu email">
+            </div>
+            
+            <button id="submit-btn" disabled>RESERVAR TURNO</button>
+            
+            <div class="status-message" id="status-message"></div>
+        </div>
+        
+        <div class="summary">
+            <div class="section-title">Resumen</div>
+            <div class="summary-item">
+                <span class="summary-label">Servicio:</span>
+                <span id="summary-service" class="summary-value">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Fecha:</span>
+                <span id="summary-date" class="summary-value">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Hora:</span>
+                <span id="summary-time" class="summary-value">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Nombre:</span>
+                <span id="summary-name" class="summary-value">-</span>
+            </div>
+            <div class="summary-total">
+                <span>Total:</span>
+                <span id="summary-total" class="summary-value">$0</span>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div>BARBERÍA © 2024</div>
+    </footer>
+
+    <script>
+        // Datos del sistema
+        const services = [
+            { id: 1, name: "CORTE", price: 1500, duration: "30 min" },
+            { id: 2, name: "BARBA", price: 1000, duration: "20 min" },
+            { id: 3, name: "CORTE + BARBA", price: 2200, duration: "50 min" },
+            { id: 4, name: "AFEITADO", price: 1200, duration: "25 min" }
+        ];
+        
+        const timeSlots = [
+            "09:00", "10:00", "11:00", "12:00", 
+            "14:00", "15:00", "16:00", "17:00", "18:00"
+        ];
+        
+        // Estado de la reserva
+        let booking = {
+            service: null,
+            date: null,
+            time: null,
+            name: "",
+            phone: "",
+            email: ""
+        };
+        
+        // Variables para el calendario
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            renderServices();
+            renderCalendar();
+            renderTimeSlots();
+            setupEventListeners();
+            updateSummary();
+        });
+        
+        // Renderizar servicios
+        function renderServices() {
+            const container = document.getElementById('services');
+            container.innerHTML = '';
+            
+            services.forEach(service => {
+                const option = document.createElement('div');
+                option.className = 'option';
+                option.dataset.id = service.id;
+                option.innerHTML = `
+                    <div style="margin-bottom: 4px;">${service.name}</div>
+                    <div style="font-size:12px;color:#888;">$${service.price}</div>
+                `;
+                
+                option.addEventListener('click', () => selectService(service.id));
+                container.appendChild(option);
+            });
+        }
+        
+        // Renderizar calendario
+        function renderCalendar() {
+            const container = document.getElementById('calendar-container');
+            
+            // Mes actual
+            const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+            
+            const calendarHTML = `
+                <div class="calendar-header">
+                    <button id="prev-month">‹</button>
+                    <div>${monthNames[currentMonth]} ${currentYear}</div>
+                    <button id="next-month">›</button>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day">LUN</div>
+                    <div class="calendar-day">MAR</div>
+                    <div class="calendar-day">MIÉ</div>
+                    <div class="calendar-day">JUE</div>
+                    <div class="calendar-day">VIE</div>
+                    <div class="calendar-day">SÁB</div>
+                    <div class="calendar-day">DOM</div>
+                    ${generateCalendarDates()}
+                </div>
+            `;
+            
+            container.innerHTML = calendarHTML;
+            
+            // Event listeners para navegación del calendario
+            document.getElementById('prev-month').addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                renderCalendar();
+            });
+            
+            document.getElementById('next-month').addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                renderCalendar();
+            });
+        }
+        
+        // Generar fechas del calendario
+        function generateCalendarDates() {
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = (firstDay.getDay() + 6) % 7; // Lunes como primer día
+            
+            let datesHTML = '';
+            const today = new Date();
+            
+            // Días del mes anterior (relleno)
+            for (let i = 0; i < startingDay; i++) {
+                datesHTML += `<div class="calendar-date disabled"></div>`;
+            }
+            
+            // Días del mes actual
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const isToday = date.toDateString() === today.toDateString();
+                const isPast = date < today && !isToday;
+                const isSelected = booking.date && date.toDateString() === booking.date.toDateString();
+                
+                let className = 'calendar-date';
+                if (isPast) className += ' disabled';
+                if (isSelected) className += ' selected';
+                
+                if (isPast) {
+                    datesHTML += `<div class="${className}">${day}</div>`;
+                } else {
+                    datesHTML += `<div class="${className}" data-day="${day}">${day}</div>`;
+                }
+            }
+            
+            return datesHTML;
+        }
+        
+        // Renderizar horarios
+        function renderTimeSlots() {
+            const container = document.getElementById('time-slots');
+            container.innerHTML = '';
+            
+            timeSlots.forEach(time => {
+                const slot = document.createElement('div');
+                slot.className = 'time-slot';
+                slot.textContent = time;
+                slot.dataset.time = time;
+                
+                // Deshabilitar horarios pasados para hoy
+                if (booking.date) {
+                    const today = new Date();
+                    if (booking.date.toDateString() === today.toDateString()) {
+                        const currentTime = today.getHours() * 60 + today.getMinutes();
+                        const slotTime = parseInt(time.split(':')[0]) * 60 + parseInt(time.split(':')[1]);
+                        if (slotTime < currentTime) {
+                            slot.classList.add('disabled');
+                        }
+                    }
+                }
+                
+                if (!slot.classList.contains('disabled')) {
+                    slot.addEventListener('click', () => selectTime(time));
+                }
+                
+                container.appendChild(slot);
+            });
+            
+            // Resaltar hora seleccionada
+            if (booking.time) {
+                const selectedSlot = document.querySelector(`.time-slot[data-time="${booking.time}"]`);
+                if (selectedSlot) selectedSlot.classList.add('selected');
+            }
+        }
+        
+        // Configurar event listeners
+        function setupEventListeners() {
+            // Selección de fecha (delegación de eventos)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('calendar-date') && !e.target.classList.contains('disabled')) {
+                    const day = parseInt(e.target.dataset.day);
+                    selectDate(day);
+                }
+            });
+            
+            // Datos del formulario
+            document.getElementById('name').addEventListener('input', function(e) {
+                booking.name = e.target.value.trim();
+                updateSubmitButton();
+                updateSummary();
+            });
+            
+            document.getElementById('phone').addEventListener('input', function(e) {
+                booking.phone = e.target.value.trim();
+                updateSubmitButton();
+            });
+            
+            document.getElementById('email').addEventListener('input', function(e) {
+                booking.email = e.target.value.trim();
+                updateSubmitButton();
+            });
+            
+            // Botón de envío
+            document.getElementById('submit-btn').addEventListener('click', submitBooking);
+        }
+        
+        // Seleccionar servicio
+        function selectService(serviceId) {
+            // Remover selección anterior
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Agregar selección actual
+            const selected = document.querySelector(`.option[data-id="${serviceId}"]`);
+            selected.classList.add('selected');
+            
+            // Actualizar estado
+            booking.service = services.find(s => s.id === serviceId);
+            updateSubmitButton();
+            updateSummary();
+        }
+        
+        // Seleccionar fecha
+        function selectDate(day) {
+            // Remover selección anterior
+            document.querySelectorAll('.calendar-date.selected').forEach(date => {
+                date.classList.remove('selected');
+            });
+            
+            // Agregar selección actual
+            const selected = document.querySelector(`.calendar-date[data-day="${day}"]`);
+            selected.classList.add('selected');
+            
+            // Actualizar estado
+            booking.date = new Date(currentYear, currentMonth, day);
+            
+            // Actualizar horarios
+            renderTimeSlots();
+            
+            // Limpiar hora seleccionada si ya había una
+            if (booking.time) {
+                booking.time = null;
+                document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                    slot.classList.remove('selected');
+                });
+            }
+            
+            updateSubmitButton();
+            updateSummary();
+        }
+        
+        // Seleccionar hora
+        function selectTime(time) {
+            // Remover selección anterior
+            document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // Agregar selección actual
+            const selected = document.querySelector(`.time-slot[data-time="${time}"]`);
+            selected.classList.add('selected');
+            
+            // Actualizar estado
+            booking.time = time;
+            updateSubmitButton();
+            updateSummary();
+        }
+        
+        // Actualizar resumen
+        function updateSummary() {
+            // Servicio
+            document.getElementById('summary-service').textContent = 
+                booking.service ? booking.service.name : "-";
+            
+            // Fecha
+            document.getElementById('summary-date').textContent = 
+                booking.date ? booking.date.toLocaleDateString('es-ES', { 
+                    weekday: 'short', 
+                    day: 'numeric', 
+                    month: 'short' 
+                }) : "-";
+            
+            // Hora
+            document.getElementById('summary-time').textContent = booking.time || "-";
+            
+            // Nombre
+            document.getElementById('summary-name').textContent = booking.name || "-";
+            
+            // Total
+            document.getElementById('summary-total').textContent = 
+                booking.service ? `$${booking.service.price}` : "$0";
+        }
+        
+        // Actualizar estado del botón de envío
+        function updateSubmitButton() {
+            const isComplete = booking.service && booking.date && booking.time && 
+                              booking.name && booking.phone && booking.email;
+            
+            document.getElementById('submit-btn').disabled = !isComplete;
+        }
+        
+        // Enviar reserva con backend real
+        async function submitBooking() {
+            const button = document.getElementById('submit-btn');
+            const status = document.getElementById('status-message');
+            
+            // Mostrar estado de carga
+            button.disabled = true;
+            status.className = "status-message loading";
+            status.textContent = "ENVIANDO RESERVA...";
+            status.style.display = "block";
+            
+            try {
+                // Preparar datos para enviar
+                const bookingData = {
+                    service: booking.service.name,
+                    price: booking.service.price,
+                    date: booking.date.toISOString().split('T')[0],
+                    time: booking.time,
+                    name: booking.name,
+                    phone: booking.phone,
+                    email: booking.email,
+                    toEmail: "jonatandiazceres15@gmail.com" // Tu email
+                };
+                
+                // Enviar al backend real
+                const response = await fetch('https://script.google.com/macros/s/AKfycby.../exec', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookingData)
+                });
+                
+                // Éxito (no-cors no permite leer respuesta)
+                status.className = "status-message success";
+                status.textContent = "✓ TURNO RESERVADO. RECIBIRÁS UN CORREO.";
+                
+                // Reiniciar formulario después de 3 segundos
+                setTimeout(() => {
+                    resetForm();
+                    status.style.display = "none";
+                }, 3000);
+                
+            } catch (error) {
+                // Error
+                status.className = "status-message error";
+                status.textContent = "✗ ERROR AL RESERVAR. INTENTA NUEVAMENTE.";
+                
+                // Reactivar botón
+                setTimeout(() => {
+                    button.disabled = false;
+                    status.style.display = "none";
+                }, 3000);
+            }
+        }
+        
+        // Reiniciar formulario
+        function resetForm() {
+            // Limpiar selecciones
+            booking = {
+                service: null,
+                date: null,
+                time: null,
+                name: "",
+                phone: "",
+                email: ""
+            };
+            
+            // Limpiar UI
+            document.querySelectorAll('.option.selected').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.calendar-date.selected').forEach(date => {
+                date.classList.remove('selected');
+            });
+            
+            document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // Limpiar campos de entrada
+            document.getElementById('name').value = "";
+            document.getElementById('phone').value = "";
+            document.getElementById('email').value = "";
+            
+            // Actualizar resumen
+            updateSummary();
+            updateSubmitButton();
+            
+            // Volver al mes actual
+            currentMonth = new Date().getMonth();
+            currentYear = new Date().getFullYear();
+            renderCalendar();
+        }
+    </script>
+</body>
+</html>
